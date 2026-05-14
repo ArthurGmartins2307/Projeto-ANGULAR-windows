@@ -215,8 +215,92 @@ export interface Ticket {
     </main>
   } @else {
     <div class="user-portal-wrapper">
-      <header class="portal-header"><div class="portal-nav"><div class="logo-area-simple"><div class="logo-icon-simple"><i class="fa-solid fa-fire-flame-curved"></i></div><h1 class="logo-text">FlameDesk Support</h1></div><div class="portal-user-actions"><span class="welcome-text">Olá, {{ authEmail.split('@')[0] }}</span><button class="btn-logout-simple" (click)="logout()">Sair</button></div></div><div class="portal-hero"><h1>Como podemos ajudar?</h1><p>Relate seu problema agora mesmo.</p><button class="btn-hero-primary" (click)="openForm()"><i class="fa-solid fa-comment-dots"></i> Nova Reclamação</button></div></header>
-      <main class="portal-body"><section class="portal-tickets-section"><h2>Seus Chamados Recentes</h2><div class="tickets-list portal-list">@if (isLoading) { <div class="loading-state"><i class="fa-solid fa-circle-notch fa-spin"></i></div> } @else { @if (tickets.length === 0) { <div class="empty-state-portal"><p>Tudo tranquilo por aqui!</p></div> } @for (ticket of tickets; track ticket.id) { <div class="ticket-card simple-card" [class.resolved]="ticket.status === 'RESOLVED'"><div class="ticket-status-bar" [ngClass]="ticket.status.toLowerCase()"></div><div class="ticket-content"><div class="ticket-header"><span class="ticket-id">#{{ ticket.id | number:'3.0-0' }}</span><h3 class="ticket-title">{{ ticket.title }}</h3></div><p class="ticket-desc">{{ ticket.description }}</p><div class="ticket-meta"><div class="badges"><span class="badge-status" [ngClass]="ticket.status.toLowerCase()">{{ getStatusLabel(ticket.status) }}</span></div></div></div></div> } } </div></section></main>
+      <header class="portal-header">
+        <div class="portal-nav">
+          <div class="logo-area-simple">
+            <div class="logo-icon-simple"><i class="fa-solid fa-fire-flame-curved"></i></div>
+            <h1 class="logo-text">FlameDesk</h1>
+          </div>
+          <div class="portal-user-actions">
+            <div class="user-profile-simple">
+              <img src="https://ui-avatars.com/api/?name={{authEmail.split('@')[0]}}&background=ff5e00&color=fff" alt="Avatar">
+              <span class="welcome-text">Olá, {{ authEmail.split('@')[0] }}</span>
+            </div>
+            <button class="btn-logout-simple" (click)="logout()"><i class="fa-solid fa-arrow-right-from-bracket"></i> Sair</button>
+          </div>
+        </div>
+      </header>
+
+      <div class="portal-hero">
+        <div class="hero-content">
+          <h1>Central de Ajuda</h1>
+          <p>Como podemos ajudar você hoje? Acompanhe seus chamados ou abra uma nova solicitação.</p>
+          <button class="btn-hero-primary" (click)="openForm()">
+            <i class="fa-solid fa-comment-dots"></i> Nova Solicitação
+          </button>
+        </div>
+      </div>
+
+      <main class="portal-body">
+        <section class="portal-stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon open"><i class="fa-solid fa-folder-open"></i></div>
+            <div class="stat-details"><h3>{{ openTickets }}</h3><p>Em Aberto</p></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon total"><i class="fa-solid fa-layer-group"></i></div>
+            <div class="stat-details"><h3>{{ totalTickets }}</h3><p>Total de Chamados</p></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon resolved"><i class="fa-solid fa-circle-check"></i></div>
+            <div class="stat-details"><h3>{{ resolvedTickets }}</h3><p>Resolvidos</p></div>
+          </div>
+        </section>
+
+        <section class="portal-tickets-section">
+          <div class="section-header-portal">
+            <h2>Seus Chamados Recentes</h2>
+            <div class="search-bar-portal">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <input type="text" placeholder="Buscar chamados..." [(ngModel)]="userSearchQuery">
+            </div>
+          </div>
+
+          <div class="tickets-list portal-list">
+            @if (isLoading) { 
+              <div class="loading-state"><i class="fa-solid fa-circle-notch fa-spin"></i><p>Carregando seus chamados...</p></div> 
+            } @else { 
+              @if (filteredUserTickets.length === 0) { 
+                <div class="empty-state-portal">
+                  <div class="empty-icon"><i class="fa-regular fa-face-smile-wink"></i></div>
+                  <h3>Nenhum chamado encontrado</h3>
+                  <p>Você não possui chamados com essa busca ou ainda não abriu nenhum.</p>
+                  <button class="btn-secondary mt-20" (click)="openForm()">Abrir um chamado agora</button>
+                </div> 
+              } 
+              @for (ticket of filteredUserTickets; track ticket.id) { 
+                <div class="ticket-card simple-card" [class.resolved]="ticket.status === 'RESOLVED'">
+                  <div class="ticket-status-bar" [ngClass]="ticket.status.toLowerCase()"></div>
+                  <div class="ticket-content">
+                    <div class="ticket-header">
+                      <span class="ticket-id">#{{ ticket.id | number:'3.0-0' }}</span>
+                      <h3 class="ticket-title">{{ ticket.title }}</h3>
+                    </div>
+                    <p class="ticket-desc">{{ ticket.description }}</p>
+                    <div class="ticket-meta">
+                      <div class="meta-item"><i class="fa-regular fa-clock"></i><span>{{ ticket.created_at | date:'dd/MM HH:mm' }}</span></div>
+                      <div class="badges">
+                        <span class="badge-priority" [ngClass]="ticket.priority.toLowerCase()">{{ getPriorityLabel(ticket.priority) }}</span>
+                        <span class="badge-status" [ngClass]="ticket.status.toLowerCase()">{{ getStatusLabel(ticket.status) }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div> 
+              } 
+            } 
+          </div>
+        </section>
+      </main>
     </div>
   }
   @if (showNewTicketForm) {
@@ -250,10 +334,37 @@ export interface Ticket {
 .badges { display: flex; gap: 10px; } .badge-status { font-size: 0.7rem; padding: 2px 8px; border-radius: 100px; border: 1px solid currentColor; }
 .ticket-actions { display: flex; flex-direction: column; gap: 5px; padding: 10px; border-left: 1px solid var(--border-color); background: rgba(0,0,0,0.2); }
 .action-btn { width: 32px; height: 32px; border: none; background: #2a1b14; color: white; border-radius: 6px; cursor: pointer; }
-.user-portal-wrapper { width: 100%; height: 100vh; overflow-y: auto; background-image: radial-gradient(circle at 50% 0%, rgba(120, 45, 10, 0.2) 0%, #0c0806 100%); }
-.portal-header { padding: 20px 5%; border-bottom: 1px solid rgba(255,255,255,0.05); } .portal-nav { display: flex; justify-content: space-between; align-items: center; }
-.portal-hero { padding: 40px 0; text-align: center; } .btn-hero-primary { background: linear-gradient(135deg, var(--primary-color), #ff2a00); color: white; border: none; padding: 16px 32px; border-radius: 100px; font-weight: 600; cursor: pointer; box-shadow: 0 10px 20px var(--primary-glow); }
-.portal-body { padding: 30px 5%; max-width: 800px; margin: 0 auto; } .modal-overlay { position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; z-index: 100; }
+.user-portal-wrapper { width: 100%; height: 100vh; overflow-y: auto; background: #0c0806; background-image: radial-gradient(circle at 50% -20%, rgba(255, 94, 0, 0.15) 0%, rgba(12, 8, 6, 1) 60%); }
+.portal-header { padding: 15px 5%; background: rgba(12, 8, 6, 0.8); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border-color); position: sticky; top: 0; z-index: 10; }
+.portal-nav { display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto; width: 100%; }
+.logo-area-simple { display: flex; align-items: center; gap: 10px; }
+.logo-icon-simple { width: 40px; height: 40px; background: linear-gradient(135deg, #ff8a00, #ff1100); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
+.portal-user-actions { display: flex; align-items: center; gap: 20px; }
+.user-profile-simple { display: flex; align-items: center; gap: 10px; }
+.user-profile-simple img { width: 36px; height: 36px; border-radius: 50%; border: 2px solid var(--border-color); }
+.welcome-text { font-weight: 500; font-size: 0.95rem; display: none; } @media(min-width: 768px) { .welcome-text { display: block; } }
+.btn-logout-simple { background: rgba(255,255,255,0.05); color: #ff6666; border: 1px solid rgba(255,102,102,0.2); padding: 8px 16px; border-radius: 100px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 8px; font-weight: 500; }
+.btn-logout-simple:hover { background: rgba(255,102,102,0.1); border-color: #ff6666; }
+.portal-hero { padding: 60px 5% 40px; text-align: center; max-width: 800px; margin: 0 auto; }
+.hero-content h1 { font-size: 2.8rem; margin-bottom: 15px; background: linear-gradient(to right, #fff, #ffb380); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.hero-content p { color: var(--text-muted); font-size: 1.1rem; margin-bottom: 30px; line-height: 1.5; }
+.btn-hero-primary { background: linear-gradient(135deg, var(--primary-color), #ff2a00); color: white; border: none; padding: 16px 36px; border-radius: 100px; font-weight: 600; font-size: 1.1rem; cursor: pointer; box-shadow: 0 10px 25px var(--primary-glow); transition: transform 0.2s, box-shadow 0.2s; display: inline-flex; align-items: center; gap: 10px; }
+.btn-hero-primary:hover { transform: translateY(-2px); box-shadow: 0 15px 30px var(--primary-glow); }
+.portal-body { padding: 0 5% 60px; max-width: 1000px; margin: 0 auto; }
+.portal-stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 40px; }
+.portal-tickets-section { background: rgba(20, 12, 9, 0.6); border: 1px solid var(--border-color); border-radius: 20px; padding: 30px; backdrop-filter: blur(10px); }
+.section-header-portal { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px; }
+.section-header-portal h2 { font-size: 1.5rem; }
+.search-bar-portal { background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 100px; padding: 10px 20px; display: flex; align-items: center; gap: 10px; min-width: 250px; }
+.search-bar-portal input { background: transparent; border: none; color: white; outline: none; width: 100%; font-size: 0.95rem; }
+.search-bar-portal i { color: var(--text-muted); }
+.empty-state-portal { text-align: center; padding: 50px 20px; color: var(--text-muted); }
+.empty-icon { font-size: 3rem; margin-bottom: 15px; color: rgba(255, 94, 0, 0.5); }
+.empty-state-portal h3 { color: white; margin-bottom: 10px; font-size: 1.2rem; }
+.mt-20 { margin-top: 20px; }
+.btn-secondary { background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); color: white; padding: 10px 20px; border-radius: 100px; cursor: pointer; transition: background 0.2s; }
+.btn-secondary:hover { background: rgba(255,255,255,0.1); }
+.modal-overlay { position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; z-index: 100; }
 .modal-content { background: var(--bg-panel); border: 1px solid var(--border-color); border-radius: 20px; width: 90%; max-width: 500px; padding: 20px; }
 .priority-selector { display: flex; gap: 10px; margin: 10px 0; } .priority-option { flex: 1; padding: 10px; border: 1px solid var(--border-color); border-radius: 8px; text-align: center; cursor: pointer; font-size: 0.8rem; }
 .priority-option.selected { background: var(--primary-color); border-color: white; color: white; } .priority-option input { display: none; }
@@ -268,6 +379,7 @@ export class AppComponent implements OnInit {
   authEmail = ''; authPassword = ''; authError = ''; isAuthLoading = false;
   currentView = 'dashboard'; tickets: Ticket[] = []; isLoading = false;
   showNewTicketForm = false; newTicketTitle = ''; newTicketDesc = ''; newTicketPriority: 'LOW' | 'MEDIUM' | 'HIGH' = 'LOW';
+  userSearchQuery = '';
   async ngOnInit() { }
   async doLogin() {
     this.authError = ''; if (!this.authEmail || !this.authPassword) { this.authError = 'Preencha email e senha.'; return; }
@@ -292,6 +404,7 @@ export class AppComponent implements OnInit {
   async updateStatus(ticket: Ticket, newStatus: string) { this.isLoading = true; await this.db.updateTicket(ticket.id, newStatus); await this.loadTickets(); }
   get totalTickets() { return this.tickets.length; } get openTickets() { return this.tickets.filter(t => t.status === 'OPEN').length; } get resolvedTickets() { return this.tickets.filter(t => t.status === 'RESOLVED').length; }
   get filteredTickets() { return this.currentView === 'my_tickets' ? this.tickets.filter(t => t.status !== 'RESOLVED') : this.tickets; }
+  get filteredUserTickets() { if (!this.userSearchQuery) return this.tickets; const q = this.userSearchQuery.toLowerCase(); return this.tickets.filter(t => t.title.toLowerCase().includes(q) || t.description.toLowerCase().includes(q)); }
   getStatusLabel(s: string) { return s === 'OPEN' ? 'Aberto' : s === 'IN_PROGRESS' ? 'Em curso' : 'Resolvido'; }
   getPriorityLabel(p: string) { return p === 'HIGH' ? 'Crítica' : p === 'MEDIUM' ? 'Média' : 'Baixa'; }
   openForm() { this.showNewTicketForm = true; } closeForm() { this.showNewTicketForm = false; }
