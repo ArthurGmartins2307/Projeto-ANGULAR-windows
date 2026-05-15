@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-~readme
-=======
-# Projeto-ANGULAR-windows
->>>>>>> b0cee4a975d49fb4031ad4b606651fa5571ade54
+Neste projeto, eu me aprofundei em uma ferramenta nova no desenvolvimento web chamado framework, nesse projeto, nós aprendemos a usar o AngularJS, o tema do projeto é um sistema de chamados, sinta se a vontade para explorar este trabalho. Abaixo você vera o link do tutorial completo de como fazer o trabalho do zero, ensinando a baixar o angular, explicando o que cada comando de instalação faz e pra que ele serve, e também tem subcategorias que ensinam a baixar o VScode e o nodejs com npm caso você precise
+
+https://www.notion.so/Tutorial-Instala-o-e-pl-gio-do-projeto-Angular-sistema-de-chamados-3614e11ad069803b919ccc97a5dc1563?source=copy_link
